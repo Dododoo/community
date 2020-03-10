@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.csu.community.community.dao.UserMapper">
+
+    <cache />
+    <!-- 当每次查询的字段出现大量重复时可将其提取出来,从而实现复用-->
+<sql id="selectFields">
+    id, username, password, salt, email, type, status, activation_code as activationCode, header_url as headerUrl, create_time as createTime
+</sql>
+    <sql id="insertFields">
+        username, password, salt, email, type, status, activation_code as activationCode, header_url as headerUrl, create_time as createTime
+    </sql>
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.csu.community.community.entity.User">
+    SELECT id, username, password, salt, email, type, status, activation_code as activationCode, header_url as headerUrl, create_time as createTime
+    from user
+    where id = #{id}
+  </select>
+
+    <select id="selectByName" parameterType="java.lang.String" resultType="com.csu.community.community.entity.User">
+    SELECT <include refid="selectFields"></include>
+    from user
+    where username = #{username}
+  </select>
+
+    <select id="selectByEmail" parameterType="java.lang.String" resultType="com.csu.community.community.entity.User">
+    SELECT <include refid="selectFields"></include>
+    from user
+    where email = #{email}
+  </select>
+    <!-- keyProperty字段是因为mysql会自动生成id，mybatis会从mysql得到这个id，来填入这个User对象实例中，我们插入时是没有id字段的-->
+    <insert id="insertUser" parameterType="com.csu.community.community.entity.User" keyProperty="id">
+    insert into user (<include refid="insertFields"></include>)
+    value (#{username},#{password},#{email},#{type},#{status},#{activationCode},#{headerUrl},#{createTime})
+    </insert>
+
+    <update id="updateStatus" >
+        update user set status = #{status} where id = #{id}
+    </update>
+
+    <update id="updateHeaderUrl" >
+        update user set header_url = #{headerUrl} where id = #{id}
+    </update>
+
+    <update id="updatePassword" >
+        update user set password = #{password} where id = #{id}
+    </update>
+</mapper>
